@@ -1,0 +1,52 @@
+---
+- hosts: all
+  become: true
+  vars_files:
+    - vars/default.yml
+
+  tasks:
+    - name: Install net-tools for XAMPP
+      apt:
+        name: net-tools
+        update_cache: yes
+    - name: Get XAMPP
+      get_url: 
+        url: https://www.apachefriends.org/xampp-files/8.0.0/xampp-linux-x64-8.0.0-0-installer.run?from_af=true
+        dest: /tmp/xampp-linux.run
+        mode: '0555'
+    - name: Install XAMPP
+      command: /tmp/xampp-linux.run --mode unattended --unattendedmodeui minimal
+
+    - name: Read TWCC credential file
+      shell: cat {{ twcc_credential }}
+      become_user: ubuntu
+      register: twcc_credential_file
+    - name: Checking API Key is in system
+      become_user: ubuntu
+      when: twcc_credential_file.stdout.find('twcc_api_key') == -1
+      fail: msg="NO TWCC API Key, check document"
+    - name: Use TWCC-CLI to open http
+      become_user: ubuntu
+      shell: twccli net vcs -s `hostname | grep -Eo '[[:digit:]]{7}'` -cidr {{ allow_http_cidr }} -p 80 
+
+    - name: Ensure wordpress directory exists
+      file:
+        path: /opt/wordpress
+        state: directory
+    - name: Puting Wordpress
+      unarchive: 
+        src: https://tw.wordpress.org/latest-zh_TW.tar.gz
+        dest: /opt
+        creates: /opt/wordpress/wp-config-sample.php
+        remote_src: yes
+        owner: daemon
+    - name: Create symbolic link 
+      file:
+        src: /opt/wordpress
+        dest: /opt/lampp/htdocs/wp
+        state: link
+    - name: Start XAMPP MySQL
+      command: /opt/lampp/lampp startmysql
+    - name: Create DB name wordpress
+      shell: echo "CREATE database wordpress" | /opt/lampp/bin/mysql -u root
+
