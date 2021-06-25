@@ -33,6 +33,7 @@
     - name: Minikube Starting
       become: ubuntu
       shell: |
-        sudo usermod -aG docker $USER && newgrp docker
-        /usr/local/bin/minikube start --driver=docker
+        sudo usermod -aG docker $USER && newgrp docker && \
+        sudo setfacl -m user:$USER:rw /var/run/docker.sock && \
+        /usr/local/bin/minikube start --driver=docker && \
         /usr/local/bin/minikube kubectl -- get po -A
