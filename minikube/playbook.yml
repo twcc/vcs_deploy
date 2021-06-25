@@ -1,0 +1,43 @@
+---
+- hosts: all
+  become: true
+  tasks:
+    - name: Install tools for Minikube
+      apt:
+        update_cache: yes
+        name: 
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - gnupg
+          - lsb-release
+    - name: Install Docker GPG
+      shell:
+        cmd: curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+    - name: Install Docker source
+      shell:
+        cmd: echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+    - name: Install tools for Minikube
+      apt:
+        update_cache: yes
+        name: 
+          - docker-ce 
+          - docker-ce-cli 
+          - containerd.io
+    - name: Enable user level permission
+      shell:
+        cmd: usermod -aG docker $USER && newgrp docker
+    - name: Install Minikube (1/2)
+      shell:
+        cmd: curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64 
+    - name: Install Minikube (2/2)
+      shell:
+        cmd: install minikube-linux-amd64 /usr/local/bin/minikube
+    - name: Minikube Starting
+      become: ubuntu
+      shell:
+        cmd: /usr/local/bin/minikube start --driver=docker
+    - name: Checking Minikube
+      become: ubuntu
+      shell:
+        cmd: /usr/local/bin/minikube kubectl -- get po -A
