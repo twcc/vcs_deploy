@@ -30,15 +30,9 @@
     - name: Install Minikube (2/2)
       shell:
         cmd: install minikube-linux-amd64 /usr/local/bin/minikube
-    - name: Enable user level permission
-      become: ubuntu
-      shell:
-        cmd: sudo usermod -aG docker $USER && newgrp docker
     - name: Minikube Starting
       become: ubuntu
-      shell:
-        cmd: /usr/local/bin/minikube start --driver=docker
-    - name: Checking Minikube
-      become: ubuntu
-      shell:
-        cmd: /usr/local/bin/minikube kubectl -- get po -A
+      shell: |
+        sudo usermod -aG docker $USER && newgrp docker
+        /usr/local/bin/minikube start --driver=docker
+        /usr/local/bin/minikube kubectl -- get po -A
