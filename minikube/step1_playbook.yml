@@ -24,21 +24,21 @@
           - docker-ce 
           - docker-ce-cli 
           - containerd.io
-    - name: Enable user level permission
-      become: ubuntu
-      shell:
-        cmd: sudo usermod -aG docker $USER && newgrp docker
     - name: Install Minikube (1/2)
       shell:
         cmd: curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
     - name: Install Minikube (2/2)
       shell:
         cmd: install minikube-linux-amd64 /usr/local/bin/minikube
+    - name: Enable user level permission
+      become: ubuntu
+      shell:
+        cmd: sudo usermod -aG docker $USER && newgrp docker
     - name: Minikube Starting
       become: ubuntu
       shell:
-        cmd: bash --login /usr/local/bin/minikube start --driver=docker
+        cmd: /usr/local/bin/minikube start --driver=docker
     - name: Checking Minikube
       become: ubuntu
       shell:
-        cmd: bash --login /usr/local/bin/minikube kubectl -- get po -A
+        cmd: /usr/local/bin/minikube kubectl -- get po -A
