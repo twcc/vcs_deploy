@@ -5,8 +5,8 @@
     - name: Minikube Starting
       become: ubuntu
       shell:
-        cmd: /usr/local/bin/minikube start --driver=docker
+        cmd: bash --login /usr/local/bin/minikube start --driver=docker
     - name: Checking Minikube
       become: ubuntu
       shell:
-        cmd: /usr/local/bin/minikube kubectl -- get po -A
+        cmd: bash --login /usr/local/bin/minikube kubectl -- get po -A
