@@ -24,16 +24,12 @@
           - docker-ce 
           - docker-ce-cli 
           - containerd.io
-    - name: Install Minikube (1/2)
-      shell:
-        cmd: curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
-    - name: Install Minikube (2/2)
-      shell:
-        cmd: install minikube-linux-amd64 /usr/local/bin/minikube
+    - name: Install Minikube
+      shell: |
+        curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+        install minikube-linux-amd64 /usr/local/bin/minikube
     - name: Minikube Starting
       become: ubuntu
       shell: |
-        sudo usermod -aG docker $USER && newgrp docker && \
-        sudo setfacl -m user:$USER:rw /var/run/docker.sock && \
         /usr/local/bin/minikube start --driver=docker && \
         /usr/local/bin/minikube kubectl -- get po -A
