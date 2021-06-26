@@ -27,7 +27,7 @@
       fail: msg="NO TWCC API Key, check document"
     - name: Use TWCC-CLI to open http
       become_user: ubuntu
-      shell: twccli net vcs -s `hostname | cut -d- -f2` -cidr 0.0.0.0/0 -p 80 
+      shell: twccli net vcs -s `hostname | cut -d- -f2` -cidr 0.0.0.0/0 -p 80 -fip
     - name: Service Public IP
       become_user: ubuntu
       shell: twccli ls vcs -s `hostname | cut -d- -f2` -json | jq -r '.[0].public_ip'
