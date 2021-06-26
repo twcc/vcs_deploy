@@ -1,6 +1,7 @@
 ---
 - hosts: all
   become: true
+  gather_facts: no
   tasks:
     - name: Install Minikube
       shell: |
@@ -30,4 +31,4 @@
     - name: clone Hello World
       ansible.builtin.git:
         repo: https://github.com/paulbouwer/hello-kubernetes
-        dest: /home/ubuntu/
+        dest: /home/ubuntu/hello-kubernetes
