@@ -22,4 +22,12 @@
         update_cache: yes
         name: 
           - kubectl
-
+    - name: Install Helm
+      snap:
+        classic: yes
+        name: 
+          - helm
+    - name: clone Hello World
+      ansible.builtin.git:
+        repo: https://github.com/paulbouwer/hello-kubernetes
+        dest: /home/ubuntu/
