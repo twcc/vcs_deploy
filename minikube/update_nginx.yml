@@ -18,7 +18,7 @@
       service: name=nginx state=restarted enabled=yes
 
     - name: Read TWCC credential file
-      shell: cat {{ twcc_credential }}
+      shell: cat ~/.twcc_data/credential
       become_user: ubuntu
       register: twcc_credential_file
     - name: Checking API Key is in system
@@ -27,4 +27,15 @@
       fail: msg="NO TWCC API Key, check document"
     - name: Use TWCC-CLI to open http
       become_user: ubuntu
-      shell: twccli net vcs -s `hostname | cut -d- -f2` -cidr {{ allow_http_cidr }} -p 80 
+      shell: twccli net vcs -s `hostname | cut -d- -f2` -cidr 0.0.0.0/0 -p 80 
+    - name: Service Public IP
+      become_user: ubuntu
+      shell: twccli ls vcs -s `hostname | cut -d- -f2` -json | jq -r '.[0].public_ip'
+      register: SVC_ADDR
+
+    - name: how entry
+      become_user: ubuntu
+      debug:
+        msg:
+          - "Please link to http://{{SVC_ADDR.stdout}}"
+

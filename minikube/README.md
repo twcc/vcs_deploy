@@ -13,3 +13,12 @@
 
 `ansible-playbook -vvv install_minikube.yml`
 
+4. check for service up and running
+
+`kubectl get svc -n hello-twcc`
+
+5. expose service
+
+`ansible-playbook -vvv update_nginx.yml`
+
+6. open link according to mesg

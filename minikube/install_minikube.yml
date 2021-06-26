@@ -24,6 +24,7 @@
         name: 
           - kubectl
           - nginx
+          - jq
     - name: Install Helm
       snap:
         classic: yes
