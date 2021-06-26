@@ -12,12 +12,13 @@
       shell: |
         /usr/local/bin/minikube start --driver=docker && \
         /usr/local/bin/minikube kubectl -- get po -A 
-    - name: Install kubectl
+    - name: Install kubectl (1/2)
       become: ubuntu
       shell: |
         curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
         sudo touch /etc/apt/sources.list.d/kubernetes.list 
         echo "deb http://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee -a /etc/apt/sources.list.d/kubernetes.list
+    - name: Install kubectl (2/2)
       apt:
         update_cache: yes
         name: 
@@ -28,7 +29,13 @@
         classic: yes
         name: 
           - helm
-    - name: clone Hello World
-      ansible.builtin.git:
+    - name: Clone Hello World
+      become: ubuntu
+      git:
         repo: https://github.com/paulbouwer/hello-kubernetes
         dest: /home/ubuntu/hello-kubernetes
+    - name: Deploy Service on Minikube
+      become: ubuntu
+      args:
+        chdir: /home/ubuntu/hello-kubernetes/deploy/helm/
+      shell: helm install --create-namespace --namespace twcc-svc twcc-say-hello ./hello-kubernetes --set message="I just deployed this on Kubernetes on VCS! Welcome to TWCC."

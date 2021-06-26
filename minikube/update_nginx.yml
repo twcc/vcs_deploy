@@ -1,0 +1,18 @@
+---
+- hosts: all
+  become: true
+  gather_facts: no
+  tasks:
+    - name: get external port
+      become: ubuntu
+      shell: kubectl get svc hello-kubernetes-twcc-say-hello -n twcc-svc -o=jsonpath='{.spec.ports[0].nodePort}' 
+      register: SVC_PORT
+    - name: show external port
+      shell: echo "{{SVC_PORT.stdout}}"
+    - name: update NGINX
+      replace:
+        path: /etc/nginx/sites-enabled/default
+        regexp: 'try_files'
+        replace: 'proxy_pass http://192.168.49.2:{{SVC_PORT.stdout}}; # try_files'
+    - name: restart nginx
+      service: name=nginx state=restarted enabled=yes
